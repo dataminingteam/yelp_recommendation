@@ -10,9 +10,10 @@ vector_dim = 100
 pkl_file = 'dataset/final business.pickle'
 nltk.download('punkt')
 
+a = [[0,8],[9,26],[27,80],[81,150],[151,8350]]   # >90, >50, >20, >10, others
 
 def locate(x, a):
-    intervals = [Interval(min, max, upper_closed=False) for min, max in a]
+    intervals = [Interval(min, max, closed=True) for min, max in a]
     for i, interval in enumerate(intervals):
         if x in interval:
             return i
@@ -23,6 +24,9 @@ def generate_word(data):
     string = str(data['business_id'])
     string += data['cuisine']
     string += str(int(data['stars']))
+
+    string += 'rc' + str(locate(data['review_count'],a))
+
     string += 'os' + str(0 if data['OutdoorSeating'] == 'FALSE' else 1)
     string += 'bacc' + str(0 if data['BusinessAcceptsCreditCards'] ==
                            'FALSE' else 1)
