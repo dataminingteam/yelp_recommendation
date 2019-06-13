@@ -4,58 +4,51 @@ import nltk
 from nltk import word_tokenize
 
 import pandas as pd
-from interval import Interval
+
+import word_generate
 
 vector_dim = 100
-pkl_file = 'dataset/final business.pickle'
+business_file = 'dataset/final business.pickle'
+user_file = 'dataset/final users.pickle'
 nltk.download('punkt')
-
-a = [[0,8],[9,26],[27,80],[81,150],[151,8350]]   # >90, >50, >20, >10, others
-
-def locate(x, a):
-    intervals = [Interval(min, max, closed=True) for min, max in a]
-    for i, interval in enumerate(intervals):
-        if x in interval:
-            return i
-    return -1
-
-
-def generate_word(data):
-    string = str(data['business_id'])
-    string += data['cuisine']
-    string += str(int(data['stars']))
-
-    string += 'rc' + str(locate(data['review_count'],a))
-
-    string += 'os' + str(0 if data['OutdoorSeating'] == 'FALSE' else 1)
-    string += 'bacc' + str(0 if data['BusinessAcceptsCreditCards'] ==
-                           'FALSE' else 1)
-    string += 'rd' + str(0 if data['RestaurantsDelivery'] == 'FALSE' else 1)
-    string += 'rr' + str(0 if data['RestaurantsReservations'] ==
-                         'FALSE' else 1)
-    string += 'wifi' + str(0 if data['WiFi'] == 'No' else
-                           (1 if data['WiFi'] == 'Yes' else 2))
-    string += 'alcohol' + str(0 if data['Alcohol'] == 'Full_Bar' else
-                              (1 if data['Alcohol'] == 'Beer&Wine' else
-                               (2 if data['Alcohol'] == 'No' else 3)))
-    return string
 
 
 class mySentences(object):
-    def __init__(self, pkl_file):
-        self.dataframe = pd.read_pickle(pkl_file)
-        print(self.dataframe.head())
+    def __init__(self, business_file, user_file):
+        self.dataframe = []
+        self.dataframe.append(pd.read_pickle(business_file))
+        self.dataframe.append(pd.read_pickle(user_file))
+        self.dataframe[1] = self.dataframe[1][self.dataframe[1]['review'] > 8]
+        self.sentences = []
+        # 生成business的字符串
+        str1 = []
+        for index, line in self.dataframe[0].iterrows():
+            str1.append(word_generate.generate_business_word(line))
+        print(len(str1))
+        # print(str1[0])
+        # 生成user的字符串
+        str2 = []
+        for index, line in self.dataframe[1].iterrows():
+            
+            str2.append(word_generate.generate_user_word(line))
+        print(len(str2))
+        # print(str2[0])
+        # 交叉合并两个字符串数组，保证embedding在一个向量空间
+        for i in range(max(len(str1), len(str2))):
+            if str1:
+                self.sentences.append(str1.pop())
+            if str2:
+                self.sentences.append(str2.pop())
+        print(len(self.sentences))
+
+        # print(self.sentences[0], self.sentences[1], self.sentences[2], self.sentences[3])
 
     def __iter__(self):
-        for index, line in self.dataframe.iterrows():
-            string = generate_word(line)
-            if index < 5:
-                print(string)
-                print(word_tokenize(string))
+        for string in self.sentences:
             yield word_tokenize(string)
 
 
-sentences = mySentences(pkl_file)
+sentences = mySentences(business_file, user_file)
 logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 model = word2vec.Word2Vec(
@@ -66,4 +59,4 @@ model = word2vec.Word2Vec(
     size=vector_dim,
     workers=4)
 
-# print([model.wv.index2word[i] for i in range(50)])
+model.save('embedding.model')
