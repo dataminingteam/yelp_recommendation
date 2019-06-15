@@ -9,7 +9,7 @@ import word_generate
 
 vector_dim = 100
 business_file = 'dataset/final business.pickle'
-user_file = 'dataset/final users.pickle'
+user_file = 'dataset/users_have_tips.pickle'
 nltk.download('punkt')
 
 
@@ -20,16 +20,20 @@ class mySentences(object):
         self.dataframe.append(pd.read_pickle(user_file))
         self.dataframe[1] = self.dataframe[1][self.dataframe[1]['review'] > 8]
         self.sentences = []
+        self.user_embedding = []
+        self.business_embedding = []
         # 生成business的字符串
         str1 = []
         for index, line in self.dataframe[0].iterrows():
             str1.append(word_generate.generate_business_word(line))
+            self.business_embedding.append(word_generate.generate_business_word(line))
         print(len(str1))
         # print(str1[0])
+
         # 生成user的字符串
         str2 = []
         for index, line in self.dataframe[1].iterrows():
-            
+            self.user_embedding.append(word_generate.generate_user_word(line))
             str2.append(word_generate.generate_user_word(line))
         print(len(str2))
         # print(str2[0])
@@ -59,4 +63,8 @@ model = word2vec.Word2Vec(
     size=vector_dim,
     workers=4)
 
-model.save('embedding.model')
+#model.save('embedding_final.model')
+
+'''只针对用户特征进行embedding，获得特征矩阵'''
+# user_embedding = sentences.user_embedding
+# print(user_embedding[:5])

@@ -1,4 +1,5 @@
 from interval import Interval
+import pandas as pd
 
 
 def locate(x, a):
@@ -11,7 +12,8 @@ def locate(x, a):
 
 def generate_business_word(data):
     string = ""
-    #string = str(data['business_id'])
+    string += str(data['business_id'])
+    #string += '*'
     string += data['cuisine']
     string += 'st' + str(int(data['stars']))
 
@@ -36,17 +38,25 @@ def generate_business_word(data):
 def generate_user_word(data):
     string = ""
     #string = str(data['user_id'])
+    string += 'h'+ str(data['history'])
+
     string += 'st' + str(int(data['average_stars']))
     string += 'yoe' + str(data['years_of_elite'])
-    a = [(9, 13), (14, 22), (23, 39), (40, 88), (89, 13278)]
+
+    a = [(9, 27), (28, 58), (59, 118), (119, 260), (261, 10022)]
     string += 'rc' + str(locate(data['review'], a))
-    a = [(0, 1), (2, 4), (5, 13), (14, 46), (47, 154202)]
+
+    a = [(0, 28), (29, 72), (73, 183), (184, 619), (620, 74829)]
     string += 'uf' + str(locate(data['useful'], a))
-    a = [(0, 0), (0, 1), (2, 3), (4, 13), (14, 148658)]
+
+    a = [(0, 9), (10, 26), (27, 76), (77, 333), (334, 63148)]
     string += 'cl' + str(locate(data['cool'], a))
-    a = [(0, 0), (0, 1), (2, 3), (4, 12), (13, 130207)]
+
+    a = [(0, 7), (8, 21), (22, 60), (61, 243), (243, 49785)]
     string += 'fn' + str(locate(data['funny'], a))
-    a = [(0, 4), (5, 46), (47, 550), (551, 2254), (2255, 292798)]
+
+    a = [(0, 574), (575, 1750), (1751, 3934), (3935, 8907), (8908, 229534)]
     string += 'fr' + str(locate(data['friends'], a))
+
 
     return string

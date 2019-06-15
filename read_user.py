@@ -1,6 +1,6 @@
 import pandas as pd
 
-dataframe = pd.read_pickle('dataset/final users.pickle')
+dataframe = pd.read_pickle('dataset/users_have_tips.pickle')
 pd.set_option('display.max_columns', None)
 '''print(dataframe.head())
 
