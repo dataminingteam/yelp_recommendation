@@ -13,7 +13,7 @@ def locate(x, a):
 def generate_business_word(data):
     string = ""
     string += str(data['business_id'])
-    #string += '*'
+    string += '*'
     string += data['cuisine']
     string += 'st' + str(int(data['stars']))
 

@@ -63,7 +63,7 @@ model = word2vec.Word2Vec(
     size=vector_dim,
     workers=4)
 
-#model.save('embedding_final.model')
+model.save('embedding_616.model')
 
 '''只针对用户特征进行embedding，获得特征矩阵'''
 # user_embedding = sentences.user_embedding
